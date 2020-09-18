@@ -44,11 +44,11 @@ app.get('/restaurantsFilter/:constraint', (req, res) => {
         .then(docs => {
             let restaurants = [];
             docs.forEach(doc => {
-                if(doc.data().name.includes(req.params.constraint)
-                   || doc.data().type.includes(req.params.constraint) 
-                    || doc.data().price.toString().includes(req.params.constraint)
-                     || doc.data().reporter.includes(req.params.constraint)
-                      || doc.data().visitDate.includes(req.params.constraint)
+                if(doc.data().name.toLowerCase().includes(req.params.constraint)
+                   || doc.data().type.toLowerCase().includes(req.params.constraint) 
+                    || doc.data().price.toString().toLowerCase().includes(req.params.constraint)
+                     || doc.data().reporter.toLowerCase().includes(req.params.constraint)
+                      || doc.data().visitDate.toLowerCase().includes(req.params.constraint)
                    ) {
                     restaurants.push({
                         ...doc.data(),
