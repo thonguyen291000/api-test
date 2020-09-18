@@ -9,11 +9,6 @@ const cors = require('cors');
 
 app.set('port', (process.env.PORT || 5000));
 
-app.use(express.static('public'));
-
-app.set('views', __dirname + '/views');
-app.set('view engine', 'ejs');
-
 app.use(cors());
 app.use(bodyParser.json());
 
@@ -25,18 +20,18 @@ app.get('/', (req, res) => {
     res.send('Server is running!')
 });
 
-//Get all apartments
-app.get('/apartments', (req, res) => {
-    return db.collection('apartments').orderBy('dateCreate', 'desc').get()
+//Get all restaurants
+app.get('/restaurants', (req, res) => {
+    return db.collection('restaurants').orderBy('dateCreate', 'desc').get()
         .then(docs => {
-            let apartments = [];
+            let restaurants = [];
             docs.forEach(doc => {
-                apartments.push({
+                restaurants.push({
                     ...doc.data(),
                     id: doc.id, 
                 })
             })
-            return res.status(200).json(apartments);
+            return res.status(200).json(restaurants);
         })
         .catch(err => {
             return res.status(500).json({ error: 'Something wrongs!' })
@@ -44,24 +39,24 @@ app.get('/apartments', (req, res) => {
 });
 
 //Get with filter
-app.get('/apartmentsFilter/:constraint', (req, res) => {
-    return db.collection('apartments').get()
+app.get('/restaurantsFilter/:constraint', (req, res) => {
+    return db.collection('restaurants').get()
         .then(docs => {
-            let apartments = [];
+            let restaurants = [];
             docs.forEach(doc => {
-                if(doc.data().type.includes(req.params.constraint)
-                   || doc.data().furniture.includes(req.params.constraint) 
+                if(doc.data().name.includes(req.params.constraint)
+                   || doc.data().type.includes(req.params.constraint) 
                     || doc.data().price.toString().includes(req.params.constraint)
-                     || doc.data().dateCreate.includes(req.params.constraint)
-                      || doc.data().bedrooms.includes(req.params.constraint)
+                     || doc.data().reporter.includes(req.params.constraint)
+                      || doc.data().visitDate.includes(req.params.constraint)
                    ) {
-                    apartments.push({
+                    restaurants.push({
                         ...doc.data(),
                         id: doc.id, 
                     })
                 }
             })
-            return res.status(200).json(apartments);
+            return res.status(200).json(restaurants);
         })
         .catch(err => {
             return res.status(500).json({ error: 'Something wrongs!'})
@@ -69,46 +64,48 @@ app.get('/apartmentsFilter/:constraint', (req, res) => {
 });
 
 //Get one
-app.get('/apartment/:id', (req, res) => {
-    return db.doc(`/apartments/${req.params.id}`).get()
+app.get('/restaurant/:id', (req, res) => {
+    return db.doc(`/restaurants/${req.params.id}`).get()
         .then(doc => {
-            let apartment = {
+            let restaurant = {
                     ...doc.data(),
                     id: req.params.id
                 }
-            return res.status(200).json(apartment);
+            return res.status(200).json(restaurant);
         })
 });
 
-//Create an apartment
-app.post('/apartment', (req, res) => {
+//Create a restaurant
+app.post('/restaurant', (req, res) => {
 
     if (req.method !== "POST") {
         return res.status(400).json({ error: 'Method not allowed' });
     }
 
-    let newApartment = {
+    let newRestaurant = {
+        name: req.body.name,
         type: req.body.type,
-        bedrooms: req.body.bedrooms,
-        dateCreate: req.body.dateCreate,
+        visitDate: req.body.visitDate,
         price: req.body.price,
-        furniture: req.body.furniture,
+        serviceRating: req.body.serviceRating,
+        cleanlinessRating: req.body.cleanlinessRating,
+        foodQualityRating: req.body.foodQualityRating,
         notes: req.body.notes,
         reporter: req.body.reporter,
         url: '',
         dateCreate: new Date().toISOString()
     }
 
-    return db.collection('apartments').add(newApartment)
+    return db.collection('restaurants').add(newRestaurant)
         .then((doc) => {
-            newApartment = {
-                ...newApartment,
+            newRestaurant = {
+                ...newRestaurant,
                 id: doc.id
             }
         })
         .then(() => {       
             return res.status(201).json({ 
-                apartment: newApartment,
+                restaurant: newRestaurant,
                 message: 'Create successfully!'
             });
         })
@@ -118,8 +115,8 @@ app.post('/apartment', (req, res) => {
         })
 });
 
-//Post apartment image
-app.post('/apartment/image/:id', (req, res) => {
+//Post restaurant image
+app.post('/restaurant/image/:id', (req, res) => {
     const BusBoy = require('busboy');
     const path = require('path');
     const os = require('os');
@@ -153,8 +150,8 @@ app.post('/apartment/image/:id', (req, res) => {
         })
         .then(() => {
             const url = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${imageFileName}?alt=media`;
-            const apartment = db.collection('apartments').doc(req.params.id);
-            return apartment.update({url: url});
+            const restaurant = db.collection('restaurants').doc(req.params.id);
+            return restaurant.update({url: url});
         })
         .then(() => {
             return res.json({ message: 'Image uploaded successfully' });
@@ -167,43 +164,46 @@ app.post('/apartment/image/:id', (req, res) => {
     req.pipe(busboy);
 });
 
-//Update an apartment
-app.patch('/apartment/:id', (req, res) => {
-    const updateApartment = {
+//Update a restaurant
+app.patch('/restaurant/:id', (req, res) => {
+    let updateRestaurant = {
+        name: req.body.name,
         type: req.body.type,
-        bedrooms: req.body.bedrooms,
-        dateCreate: req.body.dateCreate,
+        visitDate: req.body.visitDate,
         price: req.body.price,
-        furniture: req.body.furniture,
+        serviceRating: req.body.serviceRating,
+        cleanlinessRating: req.body.cleanlinessRating,
+        foodQualityRating: req.body.foodQualityRating,
         notes: req.body.notes,
         reporter: req.body.reporter,
-        dateCreate: new Date().toISOString(),
         url: req.body.url,
+        dateCreate: new Date().toISOString()
     }
 
-    if(updateApartment.type === '' || 
-        updateApartment.bedrooms === '' ||
-            updateApartment.price === '' ||
-                updateApartment.furniture === '') {
-                    return res.status(500).json({ message: 'You must fill enough fields with *' });
-                }
+    if(updateRestaurant.type === '' || 
+        updateRestaurant.name === '' ||
+            updateRestaurant.price === '' ||
+                updateRestaurant.visitDate.toString() === '' ||
+                    updateRestaurant.reporter === '') {
+                        return res.status(500).json({ message: 'You must fill enough fields with *' });
+                    }
 
-    return db.collection('apartments').doc(req.params.id).update({...updateApartment})
+    return db.collection('restaurants').doc(req.params.id).update({...updateRestaurant})
         .then((doc) => {
-            const apartment = {
-                ...updateApartment,
+            const restaurant = {
+                ...updateRestaurant,
                 id: doc.id
             }
-            return res.status(201).json({apartment: apartment});
+            return res.status(201).json({restaurant: restaurant});
         })
         .catch(err => {
             return res.status(500).json({ error: 'Update failed!' })
         })
 });
 
-//Delete an apartment
-app.delete('/apartment/:id', (req, res) => {
-    return db.collection('apartments').doc(req.params.id).delete()
+//Delete a restaurant
+app.delete('/restaurant/:id', (req, res) => {
+    return db.collection('restaurants').doc(req.params.id).delete()
         .then(() => {
             return res.status(200).json({ message: 'Delete successfully!' })
         })
