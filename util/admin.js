@@ -8,5 +8,6 @@ admin.initializeApp({
 });
 
 const db = admin.firestore();
+const storage = admin.storage();
 
-module.exports = { db, admin };
+module.exports = { db, admin, storage };

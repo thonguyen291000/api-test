@@ -1,6 +1,6 @@
 const express = require("express");
 var app = express();
-const { admin, db } = require('./util/admin');
+const { admin, db, storage } = require('./util/admin');
 const bodyParser = require('body-parser');
 
 const config = require('./util/config');
@@ -151,7 +151,7 @@ app.post('/restaurant/image/:id', (req, res) => {
         .then(() => {
             const url = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${imageFileName}?alt=media`;
             const restaurant = db.collection('restaurants').doc(req.params.id);
-            return restaurant.update({url: url});
+            return restaurant.update({url: url, imageName: imageFileName});
         })
         .then(() => {
             return res.json({ message: 'Image uploaded successfully' });
@@ -202,13 +202,19 @@ app.patch('/restaurant/:id', (req, res) => {
 });
 
 //Delete a restaurant
-app.delete('/restaurant/:id', (req, res) => {
-    return db.collection('restaurants').doc(req.params.id).delete()
-        .then(() => {
-            return res.status(200).json({ message: 'Delete successfully!' })
+app.get('/restaurant/delete/:id', (req, res) => {
+    return db.collection('restaurants').doc(req.params.id).get()
+        .then((doc) => {
+            return storage.bucket().file(`${doc.data().imageName}`).delete();
         })
+        .then(() => {
+            return db.collection('restaurants').doc(req.params.id).delete();
+        })
+        .then(() => {
+            return res.status(200).json({ message: 'Delete successfully!' });
+        }) 
         .catch(err => {
-            return res.status(500).json({ error: 'Delete failed!' })
+            return res.status(500).json({ error: 'Delete failed!' });
         })
 });
 
