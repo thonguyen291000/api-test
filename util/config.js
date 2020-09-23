@@ -1,9 +1,10 @@
 module.exports = {
-    apiKey: "AIzaSyDf2V7_c73rgF0zBJftsn9K16MSZhVRbSg",
-    authDomain: "mobile-2ef47.firebaseapp.com",
-    databaseURL: "https://mobile-2ef47.firebaseio.com",
-    projectId: "mobile-2ef47",
-    storageBucket: "mobile-2ef47.appspot.com",
-    messagingSenderId: "359529262874",
-    appId: "1:359529262874:web:5c3d98f1166ddee2c946a3",
+    apiKey: "AIzaSyDgLwlPXZsgzp8MLqWnk5me6FYpaDR68xo",
+    authDomain: "irate-c55d4.firebaseapp.com",
+    databaseURL: "https://irate-c55d4.firebaseio.com",
+    projectId: "irate-c55d4",
+    storageBucket: "irate-c55d4.appspot.com",
+    messagingSenderId: "615357590652",
+    appId: "1:615357590652:web:5b5eaa9bf4a14012536df9",
+    measurementId: "G-2BEMDYHTK6"
 }

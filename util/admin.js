@@ -4,7 +4,7 @@ const serviceAccount = require('../path/to/serviceAccountKey.json');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  storageBucket: "mobile-2ef47.appspot.com"
+  storageBucket: "irate-c55d4.appspot.com"
 });
 
 const db = admin.firestore();
