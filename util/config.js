@@ -1,10 +1,10 @@
 module.exports = {
-    apiKey: "AIzaSyDgLwlPXZsgzp8MLqWnk5me6FYpaDR68xo",
-    authDomain: "irate-c55d4.firebaseapp.com",
-    databaseURL: "https://irate-c55d4.firebaseio.com",
-    projectId: "irate-c55d4",
-    storageBucket: "irate-c55d4.appspot.com",
-    messagingSenderId: "615357590652",
-    appId: "1:615357590652:web:5b5eaa9bf4a14012536df9",
-    measurementId: "G-2BEMDYHTK6"
+    apiKey: "AIzaSyBXEiCTqigljXoVX_MXGUBFrLNH-rBt1_E",
+    authDomain: "rentalz-4f645.firebaseapp.com",
+    databaseURL: "https://rentalz-4f645.firebaseio.com",
+    projectId: "rentalz-4f645",
+    storageBucket: "rentalz-4f645.appspot.com",
+    messagingSenderId: "147582182807",
+    appId: "1:147582182807:web:c7ef0aa0140469d26e90d2",
+    measurementId: "G-Y50MGZWJFW"
 }

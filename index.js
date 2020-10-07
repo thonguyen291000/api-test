@@ -9,7 +9,9 @@ const cors = require('cors');
 
 app.set('port', (process.env.PORT || 5000));
 
-app.use(cors());
+// Automatically allow cross-origin requests
+app.use(cors({ origin: true }));
+
 app.use(bodyParser.json());
 
 //User
@@ -224,13 +226,15 @@ app.post('/login', (req, res) => {
         email: req.body.email,
         password: req.body.password
     };
-
+    console.log(user);
     let globalToken;
     firebase.auth().signInWithEmailAndPassword(user.email, user.password)
         .then(data => {
+            console.log(1);
             return data.user.getIdToken();
         })
         .then(token => {
+            console.log(2);
             globalToken = token;
             return db.collection('users').where('email', "==", user.email).get();
         })
@@ -238,8 +242,10 @@ app.post('/login', (req, res) => {
             docs.forEach(doc => {
                 return res.status(200).json({token: globalToken, id: doc.id});
             })
+            console.log(globalToken);
         })
         .catch(err => {
+            console.log(4);
             console.error(err);
             // auth/wrong-password
             // auth/user-not-user
